@@ -36,3 +36,8 @@ RST08_OPCODE    equ     $CF                 ; call enter
 
 RTS_HIGH        equ     0D6H                ; 11010110
 RTS_LOW         equ     096H                ; 10010110
+SIOA_D          .EQU    32 ;$00
+SIOA_C          .EQU    33; $02
+SIOB_D          .EQU    34 ;$01
+SIOB_C          .EQU    35 ;$03
+
