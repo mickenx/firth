@@ -19,9 +19,17 @@
     RST08:                                      ; Check serial status
         jp enter
     
-    .org $0038
-    RST38:                                      ; rst 38 - INTERRUPT VECTOR [ for IM 1 ]
-        jp serialIn
+    ;.org $0038
+    ;RST38:                                      ; rst 38 - INTERRUPT VECTOR [ for IM 1 ]
+    ;    jp serialIn
+    ;------------------------------------------------------------------------------
+; SIO Vector = 0x60
+;------------------------------------------------------------------------------
+
+                .ORG    $0060
+    RST38:  
+                .DW     serialIn
+
     
     .org $0066                                  ; rst 66 - NON-MASKABLE INTERRUPT
     RST66:
