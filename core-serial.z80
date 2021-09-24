@@ -1,23 +1,92 @@
 ; serial I/O
 
 initSerial:
-    ld HL,0
+            ld HL,0
     ld (serbufused),HL
 
     ld HL,serbuf
     ld (serinptr),HL
     ld (serrdptr),HL
 
-    ld HL, linebuf
+    
+
+    ld HL, LINE_BUFSIZE
+    ld (lineBufSize), HL
+    LD      HL,serBuf
+                LD      (serinptr),HL
+                LD      (serrdptr),HL
+
+               
+
+                xor     a                       ;0 to accumulator
+                LD      (serBufUsed),A
+                LD      (serBufUsed),A
+                ld HL, linebuf
     ld (lineBufStart), HL
     ld (currkey), HL
     ld (linebuftop), HL
 
-    ld HL, LINE_BUFSIZE
-    ld (lineBufSize), HL
+;       Initialise SIO
 
-    ld A,rts_low
-    out ($80),A                             ; initialise acia
+                LD      A,$00
+                OUT     (SIOA_C),A
+                LD      A,$18
+                OUT     (SIOA_C),A
+
+                LD      A,$04
+                OUT     (SIOA_C),A
+                LD      A,$C4
+                OUT     (SIOA_C),A
+
+                LD      A,$01
+                OUT     (SIOA_C),A
+                LD      A,$18
+                OUT     (SIOA_C),A
+
+                LD      A,$03
+                OUT     (SIOA_C),A
+                LD      A,$C1
+                OUT     (SIOA_C),A
+
+                LD      A,$05
+                OUT     (SIOA_C),A
+                LD      A,RTS_LOW
+                OUT     (SIOA_C),A
+
+                LD      A,$00
+                OUT     (SIOB_C),A
+                LD      A,$18
+                OUT     (SIOB_C),A
+
+                LD      A,$04
+                OUT     (SIOB_C),A
+                LD      A,$C4
+                OUT     (SIOB_C),A
+
+                LD      A,$01
+                OUT     (SIOB_C),A
+                LD      A,$18
+                OUT     (SIOB_C),A
+
+                LD      A,$02
+                OUT     (SIOB_C),A
+                LD      A,$60           ; INTERRUPT VECTOR ADDRESS
+                OUT     (SIOB_C),A
+
+                LD      A,$03
+                OUT     (SIOB_C),A
+                LD      A,$E1
+                OUT     (SIOB_C),A
+
+                LD      A,$05
+                OUT     (SIOB_C),A
+                LD      A,RTS_LOW
+                OUT     (SIOB_C),A
+
+    
+
+   ; ld A,rts_low
+   ; out ($80),A                             ; initialise acia
     im 1
     ei
     ret
@@ -37,9 +106,9 @@ serialIntA:
                 LD      HL,(serInPtr)
                 INC     HL
                 LD      A,L
-                CP      (serABuf+SER_BUFSIZE) & $FF
+                CP      (serBuf+SER_BUFSIZE) & $FF
                 JR      NZ, notAWrap
-                LD      HL,serABuf
+                LD      HL,serBuf
 notAWrap:
                 LD      (serInPtr),HL
                 IN      A,(SIOA_D)
@@ -91,6 +160,7 @@ rtsA0:
  ;           ld (serBufUsed),A
  ;           cp SER_FULLSIZE
  ;           _if nc
+                    
  ;               ld A,RTS_HIGH
  ;               out ($80),A
  ;           _endif
@@ -138,8 +208,10 @@ getc:
     ld (serBufUsed),A
     cp SER_EMPTYSIZE
     _if c
-        ld A,RTS_LOW
-        out ($80),A
+        LD      A,RTS_LOW
+        OUT     (SIOA_C),A
+        ;ld A,RTS_LOW
+        ;out ($80),A
     _endif
     ld A,(HL)
     ei
